@@ -8,7 +8,7 @@ const chores = [
     "Empty the Bins (2nd half of the week)"
 ];
 
-const housemates = ["Araeya", "Bailey", "Jamie", "Jodie", "Olly", "Tyler"]; // Add more names if needed
+const housemates = ["Araeya", "Bailey", "Jamie", "Jodie", "Ollie", "Tyler"]; // Add more names if needed
 
 // Admin password (for demonstration purposes, this is stored securely on the real version)
 const adminPassword = "admin!";
@@ -29,17 +29,29 @@ function shuffle(array) {
     return array;
 }
 
-// Function to load chores from local storage or create a new one if not existing
+// Function to check if a week has passed
+function isWeekPassed() {
+    const lastUpdated = localStorage.getItem('lastUpdated');
+    if (!lastUpdated) return true;
+
+    const oneWeek = 7 * 24 * 60 * 60 * 1000; // One week in milliseconds
+    const now = new Date().getTime();
+    return now - lastUpdated > oneWeek;
+}
+
+// Function to load chores from local storage or shuffle if not set or week has passed
 function loadChores() {
-    const lastWeekChores = JSON.parse(localStorage.getItem('lastWeekChores')) || [];
-    let newChoresAssignment = [];
+    let savedChores = JSON.parse(localStorage.getItem('currentWeekChores'));
 
-    do {
-        newChoresAssignment = shuffle([...chores]); // Shuffle chores each week
-    } while (newChoresAssignment.some((chore, index) => chore === lastWeekChores[index]));
+    // If no saved chores or if a week has passed, shuffle and save new list
+    if (!savedChores || isWeekPassed()) {
+        let newChoresAssignment = shuffle([...chores]);
+        localStorage.setItem('currentWeekChores', JSON.stringify(newChoresAssignment));
+        localStorage.setItem('lastUpdated', new Date().getTime()); // Save current time as last updated
+        return newChoresAssignment;
+    }
 
-    localStorage.setItem('lastWeekChores', JSON.stringify(newChoresAssignment)); // Save the new assignment
-    return newChoresAssignment;
+    return savedChores; // Return saved chores if it's still within the week
 }
 
 // Function to display chores
@@ -68,13 +80,13 @@ function adminRefresh() {
 
     if (enteredPassword === adminPassword) {
         alert("Password correct! Refreshing the chore assignments...");
-        localStorage.removeItem('lastWeekChores'); // Clear stored chores
+        localStorage.removeItem('currentWeekChores'); // Clear stored chores
+        localStorage.setItem('lastUpdated', new Date().getTime()); // Reset last updated time
         displayChores(); // Refresh the table with new assignments
     } else {
         alert("Incorrect password! Access denied.");
     }
 }
 
-// Update the chores every week (this example uses a daily reset for testing)
-setInterval(displayChores, 7 * 24 * 60 * 60 * 1000); // Weekly update in milliseconds (1 week)
+// Initial display of chores
 window.onload = displayChores;
