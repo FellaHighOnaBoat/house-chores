@@ -8,9 +8,9 @@ const chores = [
     "Empty the Bins (2nd half of the week)"
 ];
 
-const housemates = ["Araeya", "Bailey", "Jamie", "Jodie", "Ollie", "Tyler"]; // Add more names if needed
+const housemates = ["Araeya", "Bailey", "Jamie", "Jodie", "Ollie", "Tyler"];
 
-// Admin password (for demonstration purposes, store this securely in the real version)
+// I am aware this in unsecure, I do not fucking care (:
 const adminPassword = "admin!";
 
 // Version identifier for the chore list
@@ -36,11 +36,12 @@ function shuffle(array) {
 async function fetchChores() {
     try {
         const response = await fetch('/api/chores');
+        if (!response.ok) throw new Error('Chore list not found');
         const data = await response.json();
         return data;
     } catch (error) {
         console.error('Error fetching chores:', error);
-        return []; // Return an empty array if there's an error
+        return [];  // Return an empty array if there's an error
     }
 }
 
@@ -50,7 +51,7 @@ async function saveChores(newChores) {
         const response = await fetch('/api/chores', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ password: adminPassword, newChores })
+            body: JSON.stringify({ password: 'admin!', newChores })
         });
 
         if (response.ok) {
@@ -82,16 +83,21 @@ async function loadChores() {
 // Function to display chores
 async function displayChores() {
     const tableBody = document.getElementById('choresTableBody');
-    const currentChores = await loadChores();
+    const currentChores = await fetchChores();
 
-    tableBody.innerHTML = ''; // Clear previous rows
+    if (currentChores.length === 0) {
+        console.error('No chores available to display.');
+        return;
+    }
+
+    tableBody.innerHTML = '';  // Clear previous rows
     housemates.forEach((housemate, index) => {
         const row = document.createElement('tr');
         const housemateCell = document.createElement('td');
         const choreCell = document.createElement('td');
 
         housemateCell.textContent = housemate;
-        choreCell.textContent = currentChores[index % currentChores.length]; // Assign chores
+        choreCell.textContent = currentChores[index % currentChores.length];  // Assign chores
 
         row.appendChild(housemateCell);
         row.appendChild(choreCell);
@@ -103,11 +109,13 @@ async function displayChores() {
 async function adminRefresh() {
     const enteredPassword = prompt("Please enter the admin password to refresh the list:");
 
-    if (enteredPassword === adminPassword) {
+    if (enteredPassword === 'admin!') {
         alert("Password correct! Refreshing the chore assignments...");
-        const newChoresAssignment = shuffle([...chores]);
-        await saveChores(newChoresAssignment); // Save new chores to the server
-        displayChores(); // Refresh the table with new assignments
+
+        // Shuffle the chores for a new assignment
+        const shuffledChores = shuffle([...chores]);
+        await saveChores(shuffledChores);  // Save new assignment to the server
+        displayChores();  // Update the display with the new chores
     } else {
         alert("Incorrect password! Access denied.");
     }
