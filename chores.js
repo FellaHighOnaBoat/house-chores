@@ -32,25 +32,36 @@ function shuffle(array) {
 // Function to check if a week has passed
 function isWeekPassed() {
     const lastUpdated = localStorage.getItem('lastUpdated');
-    if (!lastUpdated) return true;
+    console.log("Last Updated: ", lastUpdated);
+
+    if (!lastUpdated) {
+        console.log("No last updated date found. Need to shuffle.");
+        return true; // No last update means it’s the first time, so we need to shuffle
+    }
 
     const oneWeek = 7 * 24 * 60 * 60 * 1000; // One week in milliseconds
     const now = new Date().getTime();
-    return now - lastUpdated > oneWeek;
+    const weekPassed = now - parseInt(lastUpdated, 10) > oneWeek;
+    console.log("Has a week passed? ", weekPassed);
+    
+    return weekPassed;
 }
 
 // Function to load chores from local storage or shuffle if not set or week has passed
 function loadChores() {
     let savedChores = JSON.parse(localStorage.getItem('currentWeekChores'));
+    console.log("Saved chores: ", savedChores);
 
     // If no saved chores or if a week has passed, shuffle and save new list
     if (!savedChores || isWeekPassed()) {
+        console.log("Shuffling new chores");
         let newChoresAssignment = shuffle([...chores]);
         localStorage.setItem('currentWeekChores', JSON.stringify(newChoresAssignment));
         localStorage.setItem('lastUpdated', new Date().getTime()); // Save current time as last updated
         return newChoresAssignment;
     }
 
+    console.log("Returning saved chores");
     return savedChores; // Return saved chores if it's still within the week
 }
 
