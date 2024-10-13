@@ -11,7 +11,7 @@ const chores = [
 const housemates = ["Araeya", "Bailey", "Jamie", "Jodie", "Ollie", "Tyler"];
 
 // I am aware this in unsecure, I do not fucking care (:
-const adminPassword = "admin!";
+const adminPassword = "IfYouReadThisYouAreACunt";
 
 // Version identifier for the chore list
 const version = "v1.0";
@@ -109,7 +109,7 @@ async function displayChores() {
 async function adminRefresh() {
     const enteredPassword = prompt("Please enter the admin password to refresh the list:");
 
-    if (enteredPassword === 'admin!') {
+    if (enteredPassword === 'IfYouReadThisYouAreACunt') {
         alert("Password correct! Refreshing the chore assignments...");
 
         // Shuffle the chores for a new assignment
