@@ -1,7 +1,7 @@
 [
-    {"housemate": "Araeya", "chore": "Clean Toilet"},
-    {"housemate": "Bailey", "chore": "Clean Bathroom"},
-    {"housemate": "Jamie", "chore": "Clean Kitchen"},
+    {"housemate": "Araeya", "chore": "Clean Kitchen"},
+    {"housemate": "Bailey", "chore": "Clean Toilet"},
+    {"housemate": "Jamie", "chore": "Clean Bathroom"},
     {"housemate": "Jodie", "chore": "Clean Stairs/Landing"},
     {"housemate": "Olly", "chore": "Empty the Bins (1st half of the week)"},
     {"housemate": "Tyler", "chore": "Empty the Bins (2nd half of the week)"}

@@ -8,13 +8,7 @@ const chores = [
     "Empty the Bins (2nd half of the week)"
 ];
 
-const housemates = ["Araeya", "Bailey", "Jamie", "Jodie", "Ollie", "Tyler"];
-
-// I am aware this in unsecure, I do not fucking care (:
-const adminPassword = "IfYouReadThisYouAreACunt";
-
-// Version identifier for the chore list
-const version = "v1.0";
+const housemates = ["Araeya", "Bailey", "Jamie", "Jodie", "Ollie", "Tyler"]; // Add more names if needed
 
 // Function to shuffle an array (Fisher-Yates algorithm)
 function shuffle(array) {
@@ -45,17 +39,24 @@ async function fetchChores() {
     }
 }
 
-// Function to save the new chore list to the server
+// Function to save the new chore list to the server (Admin only)
 async function saveChores(newChores) {
+    const enteredPassword = prompt("Please enter the admin password:");
+
     try {
         const response = await fetch('/api/chores', {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ password: 'admin!', newChores })
+            headers: {
+                'Content-Type': 'application/json',
+                'x-admin-password': enteredPassword  // Send password in the header
+            },
+            body: JSON.stringify({ newChores })
         });
 
         if (response.ok) {
             console.log('Chores updated successfully');
+        } else if (response.status === 403) {
+            alert("Incorrect password! Access denied.");
         } else {
             console.error('Failed to update chores');
         }
@@ -64,23 +65,7 @@ async function saveChores(newChores) {
     }
 }
 
-// Function to load chores from the server, or shuffle if necessary
-async function loadChores() {
-    const serverChores = await fetchChores();
-    const savedVersion = localStorage.getItem('choreVersion');
-
-    // If no saved chores or version has changed, shuffle and save new list
-    if (!serverChores.length || savedVersion !== version) {
-        const newChoresAssignment = shuffle([...chores]);
-        await saveChores(newChoresAssignment); // Save to the server
-        localStorage.setItem('choreVersion', version); // Save the current version
-        return newChoresAssignment;
-    }
-
-    return serverChores; // Return saved chores from the server
-}
-
-// Function to display chores
+// Function to display chores from the server
 async function displayChores() {
     const tableBody = document.getElementById('choresTableBody');
     const currentChores = await fetchChores();
@@ -107,18 +92,9 @@ async function displayChores() {
 
 // Admin refresh function
 async function adminRefresh() {
-    const enteredPassword = prompt("Please enter the admin password to refresh the list:");
-
-    if (enteredPassword === 'IfYouReadThisYouAreACunt') {
-        alert("Password correct! Refreshing the chore assignments...");
-
-        // Shuffle the chores for a new assignment
-        const shuffledChores = shuffle([...chores]);
-        await saveChores(shuffledChores);  // Save new assignment to the server
-        displayChores();  // Update the display with the new chores
-    } else {
-        alert("Incorrect password! Access denied.");
-    }
+    const shuffledChores = shuffle([...chores]);
+    await saveChores(shuffledChores);  // Save new assignment to the server
+    displayChores();  // Update the display with the new chores
 }
 
 // Load the chores when the page is loaded
