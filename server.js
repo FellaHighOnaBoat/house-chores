@@ -28,6 +28,10 @@ app.get('/api/chores', (req, res) => {
 // POST API to update the chores (admin only)
 app.post('/api/chores', (req, res) => {
     const { newChores } = req.body;
+    
+    // Log the received header and expected password for debugging
+    console.log('Received password:', req.headers['x-admin-password']);
+    console.log('Expected password:', process.env.ADMIN_PASSWORD);
 
     // Check if the admin password matches the one in the environment variable
     if (req.headers['x-admin-password'] === process.env.ADMIN_PASSWORD) {
