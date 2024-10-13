@@ -48,7 +48,7 @@ async function saveChores(newChores) {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
-                'x-admin-password': enteredPassword  // Send password in the header
+                'x-admin-password': enteredPassword.trim()  // Ensure no extra spaces
             },
             body: JSON.stringify({ newChores })
         });
